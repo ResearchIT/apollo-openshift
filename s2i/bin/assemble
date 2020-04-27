@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+shopt -s dotglob
+echo "---> Installing application source..."
+mv /tmp/src/* ./
+
+# Fix source directory permissions
+fix-permissions ./
+
+# tweaked version of apollo/docker-files/build.sh
+
+pip3 install setuptools
+pip3 install nose "apollo==4.2"
+
+curl -s get.sdkman.io | bash && \
+     /bin/bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && yes | sdk install grails 2.5.5" && \
+     /bin/bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && yes | sdk install gradle 3.2.1"
+    
+/bin/bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && /bin/bash /opt/app-root/src/build.sh"
+
+# set permissions for any installed artifacts
+fix-permissions /opt/app-root

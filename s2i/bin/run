@@ -1,0 +1,57 @@
+#!/bin/bash
+
+export USER_ID=$(id -u)
+export GROUP_ID=$(id -g)
+envsubst < /tmp/passwd.template > /tmp/passwd
+export LD_PRELOAD=libnss_wrapper.so
+export NSS_WRAPPER_PASSWD=/tmp/passwd
+export NSS_WRAPPER_GROUP=/etc/group
+
+# tweaked version of apollo/docker-files/launch.sh
+WEBAPOLLO_COMMON_DATA="${WEBAPOLLO_COMMON_DATA:-/data/apollo_data}"
+
+if [ ! -e ${WEBAPOLLO_COMMON_DATA} ]; then
+	mkdir -p ${WEBAPOLLO_COMMON_DATA}
+	chmod -R 0755 ${WEBAPOLLO_COMMON_DATA}
+fi
+
+if [ ! -e "${WEBAPOLLO_COMMON_DATA}/test_file" ];then
+	su -c "touch ${WEBAPOLLO_COMMON_DATA}/test_file"
+fi
+
+export WEBAPOLLO_DB_HOST="${WEBAPOLLO_DB_HOST:-127.0.0.1}"
+export WEBAPOLLO_DB_NAME="${WEBAPOLLO_DB_NAME:-apollo}"
+export WEBAPOLLO_DB_USERNAME="${WEBAPOLLO_DB_USERNAME:-apollo}"
+export WEBAPOLLO_DB_PASSWORD="${WEBAPOLLO_DB_PASSWORD:-apollo}"
+
+
+# TODO: use variable throughout
+export WEBAPOLLO_USE_CHADO="${WEBAPOLLO_USE_CHADO:true}"
+
+export CHADO_DB_HOST="${CHADO_DB_HOST:-127.0.0.1}"
+export CHADO_DB_NAME="${CHADO_DB_NAME:-chado}"
+export CHADO_DB_USERNAME="${CHADO_DB_USERNAME:-apollo}"
+export CHADO_DB_PASSWORD="${CHADO_DB_PASSWORD:-apollo}"
+
+if [[ "${WEBAPOLLO_DB_HOST}" != "127.0.0.1" ]]; then
+    export WEBAPOLLO_HOST_FLAG="-h ${WEBAPOLLO_DB_HOST}"
+fi
+if [[ "${CHADO_DB_HOST}" != "127.0.0.1" ]]; then
+    export CHADO_HOST_FLAG="-h ${CHADO_DB_HOST}"
+fi
+
+echo "WEBAPOLLO_HOST_FLAG: $WEBAPOLLO_HOST_FLAG"
+echo "CHADO_HOST_FLAG: $CHADO_HOST_FLAG"
+
+export CATALINA_HOME="${CATALINA_HOME}"
+export CATALINA_BASE="${CATALINA_BASE}"
+
+echo "CATALINA_HOME '${CATALINA_HOME}'"
+echo "CATALINA_BASE '${CATALINA_BASE}'"
+
+# Set environment variables for tomcat
+bash /createenv.sh
+
+# Launch tomcat, stopping of already running.
+${CATALINA_HOME}/bin/catalina.sh stop 5 -force
+${CATALINA_HOME}/bin/catalina.sh run
