@@ -12,14 +12,14 @@ ENV \
     # where bin directories are
     CATALINA_HOME=/usr/share/tomcat \
     # where webapps are deployed
-    CATALINA_BASE=/usr/share/tomcat \
+    CATALINA_BASE=/opt/app-root/tomcatbase \
     CONTEXT_PATH=ROOT \
     JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
 
 
 # package installation
 RUN yum -y install epel-release && \
-        yum -y install java-1.8.0-openjdk tomcat
+        yum -y install java-1.8.0-openjdk tomcat rh-nodejs10-npm
 
 RUN npm i -g yarn
 
@@ -28,9 +28,13 @@ RUN curl -s "http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/blat" -o
  		curl -s "http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit" -o /usr/local/bin/faToTwoBit && \
  		chmod +x /usr/local/bin/faToTwoBit
 
+# make tomcat base
+RUN mkdir -p CATALINA_BASE && cd ${CATALINA_BASE} && mkdir bin && mkdir conf && mkdir lib && mkdir logs && mkdir temp && mkdir webapps && mkdir work
+RUN cp ${CATALINA_HOME}/conf/* ${CATALINA_BASE}/conf/
 
 # Copy in installdeps.R to set cran mirror & handle package installs
-COPY ./build.sh /opt/app-root/src
+COPY ./build.sh /opt/app-root/src/
+COPY ./docker-apollo-config.groovy /opt/app-root/apollo-config.groovy
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH
