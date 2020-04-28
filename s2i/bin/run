@@ -52,9 +52,11 @@ export CATALINA_BASE="${CATALINA_BASE}"
 echo "CATALINA_HOME '${CATALINA_HOME}'"
 echo "CATALINA_BASE '${CATALINA_BASE}'"
 
+cp /opt/app-root/apollo.war ${CATALINA_BASE}/webapps/
+
 # Set environment variables for tomcat
 bash /createenv.sh
 
 # Launch tomcat, stopping of already running.
-${CATALINA_HOME}/bin/catalina.sh stop 5 -force
-${CATALINA_HOME}/bin/catalina.sh run
+/usr/libexec/tomcat/server stop 5 -force
+/usr/libexec/tomcat/server start
