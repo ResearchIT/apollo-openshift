@@ -14,12 +14,15 @@ ENV \
     # where webapps are deployed
     CATALINA_BASE=/opt/app-root/tomcatbase \
     CONTEXT_PATH=ROOT \
-    JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
+    JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk \
+    # make software collections tsuff available without enabling it
+    BASH_ENV=1
 
 
 # package installation
-RUN yum -y install epel-release && \
-        yum -y install java-1.8.0-openjdk tomcat rh-nodejs10-npm
+RUN yum install -y centos-release-scl && \
+    yum install -y rh-python36 rh-python36-python-devel rh-python36-python-setuptools rh-python36-python-pip && \
+    yum install -y java-1.8.0-openjdk tomcat
 
 RUN npm i -g yarn
 
