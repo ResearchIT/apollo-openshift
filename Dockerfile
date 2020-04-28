@@ -40,6 +40,7 @@ RUN cp -R ${CATALINA_HOME}/conf/ ${CATALINA_BASE}/
 
 # Copy in installdeps.R to set cran mirror & handle package installs
 RUN mkdir -p /opt/app-root
+RUN mkdir -p /opt/app-root/data
 COPY ./build.sh /opt/app-root/src/
 COPY ./docker-apollo-config.groovy /opt/app-root/src/apollo-config.groovy
 COPY ./createenv.sh /opt/app-root/createenv.sh
@@ -54,7 +55,9 @@ COPY ./s2i/bin/run /opt/app-root/
 #   writable as OpenShift default security model is to run the container
 #   under random UID.
 RUN chown -R 1001:0 ${APP_ROOT} && \
-    fix-permissions ${APP_ROOT} -P
+    fix-permissions ${APP_ROOT} -P \
+    chown -R 1001:0 /var/cache/tomcat && \
+    fix-permissions /var/cache/tomcat -P
 
 # Copy the passwd template for nss_wrapper
 COPY passwd.template /tmp/passwd.template
