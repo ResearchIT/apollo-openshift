@@ -9,6 +9,9 @@ mv /tmp/src/* ./
 # Fix source directory permissions
 fix-permissions ./
 
+source scl_source enable rh-nodejs10
+source scl_source enable rh-python36
+
 # tweaked version of apollo/docker-files/build.sh
 
 pip3 install setuptools

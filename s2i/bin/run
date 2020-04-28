@@ -7,6 +7,9 @@ export LD_PRELOAD=libnss_wrapper.so
 export NSS_WRAPPER_PASSWD=/tmp/passwd
 export NSS_WRAPPER_GROUP=/etc/group
 
+source scl_source enable rh-nodejs10
+source scl_source enable rh-python36
+
 # tweaked version of apollo/docker-files/launch.sh
 WEBAPOLLO_COMMON_DATA="${WEBAPOLLO_COMMON_DATA:-/data/apollo_data}"
 

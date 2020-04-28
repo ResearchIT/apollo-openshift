@@ -14,9 +14,7 @@ ENV \
     # where webapps are deployed
     CATALINA_BASE=/opt/app-root/tomcatbase \
     CONTEXT_PATH=ROOT \
-    JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk \
-    # make software collections tsuff available without enabling it
-    BASH_ENV=1
+    JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
 
 
 # package installation
@@ -24,7 +22,8 @@ RUN yum install -y centos-release-scl && \
     yum install -y rh-python36 rh-python36-python-devel rh-python36-python-setuptools rh-python36-python-pip && \
     yum install -y java-1.8.0-openjdk tomcat
 
-RUN npm i -g yarn
+RUN source scl_source enable rh-nodejs10 && \
+    npm i -g yarn   
 
 RUN curl -s "http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/blat" -o /usr/local/bin/blat && \
  		chmod +x /usr/local/bin/blat && \
@@ -32,8 +31,8 @@ RUN curl -s "http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/blat" -o
  		chmod +x /usr/local/bin/faToTwoBit
 
 # make tomcat base
-RUN mkdir -p CATALINA_BASE && cd ${CATALINA_BASE} && mkdir bin && mkdir conf && mkdir lib && mkdir logs && mkdir temp && mkdir webapps && mkdir work
-RUN cp ${CATALINA_HOME}/conf/* ${CATALINA_BASE}/conf/
+RUN mkdir -p ${CATALINA_BASE} && cd ${CATALINA_BASE} && mkdir bin && mkdir lib && mkdir logs && mkdir temp && mkdir webapps && mkdir work
+RUN cp -R ${CATALINA_HOME}/conf/ ${CATALINA_BASE}/
 
 # Copy in installdeps.R to set cran mirror & handle package installs
 COPY ./build.sh /opt/app-root/src/
