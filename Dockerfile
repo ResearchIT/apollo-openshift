@@ -37,6 +37,7 @@ RUN curl -s "http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/blat" -o
 # make tomcat base
 RUN mkdir -p ${CATALINA_BASE} && cd ${CATALINA_BASE} && mkdir bin && mkdir lib && mkdir logs && mkdir temp && mkdir webapps && mkdir work
 RUN cp -R ${CATALINA_HOME}/conf/ ${CATALINA_BASE}/
+RUN echo 'CATALINA_TMPDIR="/tmp"' > /etc/tomcat/conf.d/fixtempdir.conf
 
 # Copy in installdeps.R to set cran mirror & handle package installs
 RUN mkdir -p /opt/app-root
